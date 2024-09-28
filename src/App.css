@@ -1,5 +1,14 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  background: #262729 !important;
+
+}
 .App {
   text-align: center;
+  /* padding: 0px 265px; */
 }
 
 .App-logo {
@@ -36,3 +45,39 @@
     transform: rotate(360deg);
   }
 }
+
+
+
+
+
+
+
+.menu-button {
+  display: none;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 30px; /* Adjust height as necessary */
+}
+
+.footer-img {
+  height: 30px; /* Adjust height as necessary */
+  padding:8px;
+  margin: 4px;
+  border-radius: 50px;
+  background-color: #474749;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .menu-button {
+    display: block; /* Show mobile menu button */
+  }
+}
+
+
