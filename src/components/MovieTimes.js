@@ -277,14 +277,7 @@ const MovieShowtimes = () => {
               label="Mobile No"
               name="mobileNo"
               rules={[
-                {
-                  pattern: /^[0-9]+$/, // Regex for numbers only
-                  message: "Mobile No must be a number!",
-                },
-                {
-                  required: true,
-                  message: "Please input your mobile number!",
-                },
+                { required: true, message: "Please input your mobile number!" },
               ]}
             >
               <Input />
