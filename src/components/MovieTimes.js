@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 import styled from "@emotion/styled";
-import { Button, Typography } from "antd";
+import { Button, Typography, Modal, Form, Input } from "antd";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -13,9 +13,6 @@ import img2 from "../assets/img2.jpg";
 import img3 from "../assets/img3.jpg";
 import img4 from "../assets/img4.jpg";
 import img5 from "../assets/img5.jpg";
-import img6 from "../assets/img6.jpg";
-import img7 from "../assets/img7.jpg";
-import img8 from "../assets/img8.jpg";
 
 const { Title } = Typography;
 
@@ -35,6 +32,14 @@ const TypoHeader = styled(Title)`
   font-size: 18px !important;
 `;
 
+const TypoSubTile = styled(Title)`
+  color: white !important;
+  margin: 0 0 1.5em !important;
+  text-align: left !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+`;
+
 const Container = styled.div`
   margin-top: 54px;
   min-height: 70vh;
@@ -51,7 +56,7 @@ const StyledMovieList = styled.div`
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-  z-index: 10000;
+  z-index: 1;
 `;
 
 const ShowtimeButton = styled(Button)`
@@ -69,61 +74,86 @@ const ShowtimeButton = styled(Button)`
   }
 `;
 
+const SubmitButton = styled(Button)`
+  width: -webkit-fill-available;
+  background-color: #c74250; /* Default background color */
+  color: white !important;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 16px;
+  transition: background-color 0.3s ease;
+  margin: 0px 10px 0px 10px;
+  &:hover {
+    background-color: #e05868 !important;
+  }
+`;
+
+const StyledModal = styled(Modal)`
+  .ant-modal-title {
+    text-align: center;
+  }
+  .ant-modal-body {
+    display: flex;
+    justify-content: center;
+  }
+  .ant-modal-footer {
+    display: flex;
+    justify-content: center;
+  }
+  .ant-form-item {
+    margin: 8px;
+  }
+  .ant-modal-footer {
+    margin: 0px;
+  }
+  input {
+    border-radius: 4px !important;
+  }
+`;
+
 const movies = [
   {
     id: 1,
-    title: "The Wild Robot",
+    title: "The Gray Man",
     poster: img1,
   },
   {
     id: 2,
-    title: "Devara",
+    title: "Extraction 2",
     poster: img2,
   },
 
   {
     id: 3,
-    title: "Meiyazhagan",
+    title: "Heart of Stone",
     poster: img3,
   },
   {
     id: 4,
-    title: "Kishkindha Kaandam",
+    title: "Top Gun:Maverick",
     poster: img4,
   },
   {
     id: 5,
-    title: "Transformers One",
+    title: "Fast & Furious(Hobbs & Shaw)",
     poster: img5,
-  },
-  {
-    id: 6,
-    title: "Ashek",
-    poster: img6,
-  },
-
-  {
-    id: 7,
-    title: "Never Let Go",
-    poster: img7,
-  },
-  {
-    id: 8,
-    title: "Weekend in Taipei",
-    poster: img8,
   },
 ];
 const MovieShowtimes = () => {
   const [bookings, setBookings] = useState([]); // State to hold bookings
-  const [error, setError] = useState(null); // State to hold any errors
+  const [setError] = useState(null); // State to hold any errors
+  const [modalOpen, setModalOpen] = useState(false);
   const { name } = useParams();
   const { selectedMovie } = useMovie();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const [details, setDetails] = useState("");
 
   useEffect(() => {
     getAllBooking();
     if (selectedMovie == null) navigate("/");
-  }, []);
+  });
 
   // Function to fetch bookings
   const getAllBooking = async () => {
@@ -142,13 +172,27 @@ const MovieShowtimes = () => {
   };
 
   const addBooking = async (date, time, name) => {
-    const { data, error } = await supabase
+    await supabase
       .from("bookings")
       .insert([{ movie_name: name, date: date, time: time }])
       .select();
   };
 
   const filteredBookings = movies.filter((item) => item.title === name);
+
+  const onFinish = (values) => {
+    console.log("Form values:", values);
+    setModalOpen(false); // Close modal on successful submission
+
+    navigate(
+      `/ticket?date=${details.date}&time=${details.time}&movie-name=${details.name}&username=${values.username}&mobileNo=${values.mobileNo}`
+    );
+    console.log(
+      `date ${details.date}, time ${details.time} movie-name ${details.name}`
+    );
+    form.resetFields();
+    addBooking(details.date, details.time, details.name);
+  };
 
   return (
     <Container
@@ -163,23 +207,26 @@ const MovieShowtimes = () => {
             const filteredBookings = bookings.filter(
               (booking) => booking.date === date
             );
-            if (filteredBookings.length < 2) {
+            if (filteredBookings.length < 30) {
               return (
                 <div key={date}>
+                  <TypoHeader level={5}>Accommodation 4</TypoHeader>
                   <TypoHeader level={5}>{date}</TypoHeader>
+                  <TypoSubTile>{`${
+                    30 - filteredBookings.length
+                  } seats remain`}</TypoSubTile>
 
                   <div style={{ display: "flex" }}>
                     {times.map((time, index) => (
                       <ShowtimeButton
                         key={index}
                         onClick={() => {
-                          navigate(
-                            `/ticket?date=${date}&time=${time}&movie-name=${name}`
-                          );
-                          console.log(
-                            `date ${date}, time ${time} movie-name ${name}`
-                          );
-                          addBooking(date, time, name);
+                          setModalOpen(true);
+                          setDetails({
+                            date,
+                            time,
+                            name,
+                          });
                         }}
                       >
                         {time}
@@ -197,6 +244,46 @@ const MovieShowtimes = () => {
               );
             }
           })}
+
+        <StyledModal
+          title="Enter User Details"
+          centered
+          closable={false}
+          open={modalOpen}
+          onOk={() => setModalOpen(false)} // The action for your Submit button
+          footer={[
+            <SubmitButton
+              key="submit"
+              type="primary"
+              onClick={() => form.submit()}
+            >
+              Submit
+            </SubmitButton>,
+          ]}
+          width="250px"
+        >
+          <Form name="basic" onFinish={onFinish} form={form} layout="vertical">
+            <Form.Item
+              label="Username"
+              name="username"
+              rules={[
+                { required: true, message: "Please input your username!" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Mobile No"
+              name="mobileNo"
+              rules={[
+                { required: true, message: "Please input your mobile number!" },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          </Form>
+        </StyledModal>
       </StyledMovieList>
       <div
         style={{

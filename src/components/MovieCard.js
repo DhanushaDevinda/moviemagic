@@ -31,7 +31,7 @@ const Card = styled.div`
 
 const TypoHeader = styled(Title)`
   color: white !important;
-  margin: 0.5em 0 !important;
+  margin: 0.5em 0 0 0 !important;
   text-align: left;
   font-weight: 800 !important;
   font-size: 18px !important;
@@ -39,7 +39,7 @@ const TypoHeader = styled(Title)`
 
 const TypoSubTile = styled(Title)`
   color: white !important;
-  margin: 0.5em 0 1.5em !important;
+  margin: 0 0 1.5em !important;
   text-align: left !important;
   font-weight: 400 !important;
   font-size: 12px !important;
@@ -51,7 +51,7 @@ const StyledPoster = styled.img`
   object-fit: cover;
 `;
 
-const MovieCard = ({ title, language, poster, showtimes }) => {
+const MovieCard = ({ title, language, poster, showtimes, year }) => {
   const { setSelectedMovie } = useMovie();
   const navigate = useNavigate();
   return (
@@ -59,7 +59,11 @@ const MovieCard = ({ title, language, poster, showtimes }) => {
       <StyledPoster src={poster} alt="movie poster" />
 
       <TypoHeader level={5}>{title}</TypoHeader>
-      <TypoSubTile>{`Language: ${language}`}</TypoSubTile>
+      <TypoSubTile>
+        {year}
+        <br />
+        {`Language: ${language}`}
+      </TypoSubTile>
 
       <ShowtimeButton
         onClick={() => {

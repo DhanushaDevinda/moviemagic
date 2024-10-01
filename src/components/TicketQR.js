@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
-import { Input, QRCode, Space, Typography } from "antd";
 import styled from "@emotion/styled";
-import { useParams, useSearchParams } from "react-router-dom";
+import { QRCode, Space, Typography } from "antd";
+import React from "react";
+import { useSearchParams } from "react-router-dom";
 
 import ticketBG from "../assets/ticketBG.svg";
 
 const { Title } = Typography;
 
 const Container = styled.div`
-  margin-top: 64px;
+  margin-top: 54px;
   min-height: 70vh;
   display: flex; /* Use flexbox for centering */
   justify-content: center; /* Center horizontally */
@@ -40,26 +40,14 @@ const TypoSubTile = styled(Title)`
 `;
 
 const TicketQR = () => {
-  const { booking } = useParams();
-  const [text, setText] = React.useState("");
   const [searchParams] = useSearchParams();
 
   // Access query parameters
   const date = searchParams.get("date");
   const time = searchParams.get("time");
   const movieName = searchParams.get("movie-name");
-
-  useEffect(() => {
-    // Set the text to booking only if it exists
-    if (booking) {
-      setText(booking);
-    }
-
-    // Log the parameters for debugging
-    console.log("🚀 ~ useEffect ~ date:", date);
-    console.log("🚀 ~ useEffect ~ time:", time);
-    console.log("🚀 ~ useEffect ~ movieName:", movieName);
-  }, [booking, date, time, movieName]); // Add dependencies to avoid infinite loops
+  const username = searchParams.get("username");
+  const mobileNo = searchParams.get("mobileNo");
 
   return (
     <Container>
@@ -70,12 +58,18 @@ const TicketQR = () => {
             backgroundSize: "cover", // Adjusts to cover the entire div
             backgroundPosition: "center", // Centers the image
             height: "auto", // Adjust height as necessary
-            width: "300px", // Set width
+            width: "320px", // Set width
             borderRadius: "8px", // Optional: Add border radius for aesthetics
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Optional: Add shadow for depth
           }}
         >
-          <div style={{ padding: "42px 10px 30px" }}>
+          <div style={{ padding: "20px 10px 10px" }}>
+            <TypoSubTile>Username:</TypoSubTile>
+            <TypoHeader>{username}</TypoHeader>
+
+            <TypoSubTile>Mobile No:</TypoSubTile>
+            <TypoHeader>{mobileNo}</TypoHeader>
+
             <TypoSubTile>Movie name:</TypoSubTile>
             <TypoHeader>{movieName}</TypoHeader>
 
@@ -85,11 +79,16 @@ const TicketQR = () => {
             <TypoSubTile>Time:</TypoSubTile>
             <TypoHeader>{time}</TypoHeader>
           </div>
-          <div style={{ padding: "16px" }}>
+          <div style={{ padding: "10px" }}>
             <Space direction="vertical" align="center">
               {date && time && movieName && (
                 <QRCode
-                  value={`date=${date}&time=${time}&movie-name=${movieName}`}
+                  // value={`date=${date}&time=${time}&movie-name=${movieName}&username=${username}&mobileNo=${mobileNo}`}
+                  value={`Date = ${date}\n
+                  Time = ${time}\n
+                  Movie Name = ${movieName}\n
+                  Username = ${username}\n
+                  MobileNo = ${mobileNo}`}
                   color="#262729"
                   size={130}
                   bordered={false}
