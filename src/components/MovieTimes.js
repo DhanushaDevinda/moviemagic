@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../supabase";
 
 import styled from "@emotion/styled";
-import { Button, Typography, Modal, Form, Input } from "antd";
+import { Button, Typography, Modal, Form, Input, Select } from "antd";
 import { useParams } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,7 @@ import img4 from "../assets/img4.jpg";
 import img5 from "../assets/img5.jpg";
 
 const { Title } = Typography;
+const { Option } = Select;
 
 const SoldOut = styled(Title)`
   color: #c74250 !important;
@@ -110,6 +111,9 @@ const StyledModal = styled(Modal)`
   input {
     border-radius: 4px !important;
   }
+  .ant-select-selector {
+    border-radius: 4px !important;
+  }
 `;
 
 const movies = [
@@ -150,10 +154,15 @@ const MovieShowtimes = () => {
   const [form] = Form.useForm();
   const [details, setDetails] = useState("");
 
+  let isNChairAvailable;
+  let isBChairAvailable;
   useEffect(() => {
     getAllBooking();
-    if (selectedMovie == null) navigate("/");
-  });
+  }, []);
+
+  useEffect(() => {
+    if (selectedMovie === null) navigate("/");
+  }, [selectedMovie]);
 
   // Function to fetch bookings
   const getAllBooking = async () => {
@@ -171,10 +180,12 @@ const MovieShowtimes = () => {
     }
   };
 
-  const addBooking = async (date, time, name) => {
+  const addBooking = async (date, time, name, seatType) => {
     await supabase
       .from("bookings")
-      .insert([{ movie_name: name, date: date, time: time }])
+      .insert([
+        { movie_name: name, date: date, time: time, seat_type: seatType },
+      ])
       .select();
   };
 
@@ -185,13 +196,13 @@ const MovieShowtimes = () => {
     setModalOpen(false); // Close modal on successful submission
 
     navigate(
-      `/ticket?date=${details.date}&time=${details.time}&movie-name=${details.name}&username=${values.username}&mobileNo=${values.mobileNo}`
+      `/ticket?date=${details.date}&time=${details.time}&movie-name=${details.name}&username=${values.username}&mobileNo=${values.mobileNo}&seat-type=${values.seatType}`
     );
     console.log(
-      `date ${details.date}, time ${details.time} movie-name ${details.name}`
+      `date ${details.date}, time ${details.time} movie-name ${details.name} seat type ${values.seatType}`
     );
     form.resetFields();
-    addBooking(details.date, details.time, details.name);
+    addBooking(details.date, details.time, details.name, values.seatType);
   };
 
   return (
@@ -207,14 +218,27 @@ const MovieShowtimes = () => {
             const filteredBookings = bookings.filter(
               (booking) => booking.date === date
             );
+
+            const beanBags = filteredBookings.filter(
+              (booking) => booking.seat_type === "Bean Bags"
+            );
+            const normalChairs = filteredBookings.filter(
+              (booking) => booking.seat_type === "Normal Chairs"
+            );
+
+            isNChairAvailable = normalChairs.length < 25;
+
+            isBChairAvailable = beanBags.length < 5;
+
             if (filteredBookings.length < 30) {
               return (
                 <div key={date}>
                   <TypoHeader level={5}>Accommodation 4</TypoHeader>
                   <TypoHeader level={5}>{date}</TypoHeader>
-                  <TypoSubTile>{`${
-                    30 - filteredBookings.length
-                  } seats remain`}</TypoSubTile>
+                  <TypoSubTile>
+                    {`${25 - normalChairs.length} Normal seats remain`} <br />
+                    {`${5 - beanBags.length} Bean bags remain`}
+                  </TypoSubTile>
 
                   <div style={{ display: "flex" }}>
                     {times.map((time, index) => (
@@ -264,7 +288,7 @@ const MovieShowtimes = () => {
         >
           <Form name="basic" onFinish={onFinish} form={form} layout="vertical">
             <Form.Item
-              label="Username"
+              label="Name"
               name="username"
               rules={[
                 { required: true, message: "Please input your username!" },
@@ -282,6 +306,25 @@ const MovieShowtimes = () => {
             >
               <Input />
             </Form.Item>
+
+            {(isNChairAvailable || isBChairAvailable) && (
+              <Form.Item
+                label="Seat type"
+                name="seatType"
+                rules={[
+                  { required: true, message: "Please select your Seat type!" },
+                ]}
+              >
+                <Select placeholder="Select a Seat type">
+                  {isBChairAvailable && (
+                    <Option value="Bean Bags">Bean Bags</Option>
+                  )}
+                  {isNChairAvailable && (
+                    <Option value="Normal Chairs">Normal Chairs</Option>
+                  )}
+                </Select>
+              </Form.Item>
+            )}
           </Form>
         </StyledModal>
       </StyledMovieList>

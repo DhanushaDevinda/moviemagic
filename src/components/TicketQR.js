@@ -48,6 +48,7 @@ const TicketQR = () => {
   const movieName = searchParams.get("movie-name");
   const username = searchParams.get("username");
   const mobileNo = searchParams.get("mobileNo");
+  const seatType = searchParams.get("seat-type");
 
   return (
     <Container>
@@ -64,7 +65,7 @@ const TicketQR = () => {
           }}
         >
           <div style={{ padding: "20px 10px 10px" }}>
-            <TypoSubTile>Username:</TypoSubTile>
+            <TypoSubTile>Name:</TypoSubTile>
             <TypoHeader>{username}</TypoHeader>
 
             <TypoSubTile>Mobile No:</TypoSubTile>
@@ -78,6 +79,9 @@ const TicketQR = () => {
 
             <TypoSubTile>Time:</TypoSubTile>
             <TypoHeader>{time}</TypoHeader>
+
+            <TypoSubTile>Seat Type:</TypoSubTile>
+            <TypoHeader>{seatType}</TypoHeader>
           </div>
           <div style={{ padding: "10px" }}>
             <Space direction="vertical" align="center">
